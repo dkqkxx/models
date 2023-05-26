@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,10 +32,12 @@ def _create_fake_dataset(output_path, seq_length, num_classes, num_examples):
   writer = tf.io.TFRecordWriter(output_path)
 
   def create_int_feature(values):
-    return tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+    return tf.train.Feature(
+        int64_list=tf.train.Int64List(value=np.ravel(values)))
 
   def create_float_feature(values):
-    return tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
+    return tf.train.Feature(
+        float_list=tf.train.FloatList(value=np.ravel(values)))
 
   for i in range(num_examples):
     features = {}
@@ -81,7 +83,7 @@ class SentencePredictionTaskTest(tf.test.TestCase, parameterized.TestCase):
         functools.partial(task.build_inputs, config.train_data))
 
     iterator = iter(dataset)
-    optimizer = tf.keras.optimizers.SGD(lr=0.1)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
     task.train_step(next(iterator), model, optimizer, metrics=metrics)
     model.save(os.path.join(self.get_temp_dir(), "saved_model"))
     return task.validation_step(next(iterator), model, metrics=metrics)
@@ -118,7 +120,7 @@ class SentencePredictionTaskTest(tf.test.TestCase, parameterized.TestCase):
     dataset = task.build_inputs(config.train_data)
 
     iterator = iter(dataset)
-    optimizer = tf.keras.optimizers.SGD(lr=0.1)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
     task.initialize(model)
     task.train_step(next(iterator), model, optimizer, metrics=metrics)
     task.validation_step(next(iterator), model, metrics=metrics)
@@ -149,7 +151,7 @@ class SentencePredictionTaskTest(tf.test.TestCase, parameterized.TestCase):
 
     dataset = task.build_inputs(config.train_data)
     iterator = iter(dataset)
-    optimizer = tf.keras.optimizers.SGD(lr=0.1)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
     task.train_step(next(iterator), model, optimizer, metrics=metrics)
 
     logs = task.validation_step(next(iterator), model, metrics=metrics)
@@ -160,7 +162,8 @@ class SentencePredictionTaskTest(tf.test.TestCase, parameterized.TestCase):
       self.assertLess(loss, 1.0)
 
   @parameterized.parameters(("matthews_corrcoef", 2),
-                            ("pearson_spearman_corr", 1))
+                            ("pearson_spearman_corr", 1),
+                            ("f1", 2))
   def test_np_metrics(self, metric_type, num_classes):
     config = sentence_prediction.SentencePredictionConfig(
         metric_type=metric_type,

@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class CosineLearningRateWithLinearWarmup(
   """Class to generate learning rate tensor."""
 
   def __init__(self, total_steps, params):
-    """Creates the consine learning rate tensor with linear warmup."""
+    """Creates the cosine learning rate tensor with linear warmup."""
     super(CosineLearningRateWithLinearWarmup, self).__init__()
     self._total_steps = total_steps
     assert isinstance(params, (dict, params_dict.ParamsDict))

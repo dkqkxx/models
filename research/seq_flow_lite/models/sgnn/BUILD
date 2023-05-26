@@ -1,10 +1,8 @@
 licenses(["notice"])
 
-package(
-    default_visibility = [
-        "//visibility:public",
-    ],
-)
+package(default_visibility = [
+    "//visibility:public",
+])
 
 cc_library(
     name = "sgnn_projection",
@@ -90,6 +88,7 @@ py_binary(
     main = "run_tflite.py",
     python_version = "PY3",
     deps = [
+        ":sgnn_projection_op_resolver",
         # Expect numpy installed
         # package TFLite flex delegate
         # package TFLite interpreter

@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Tests for segmentation network."""
 
 from absl.testing import parameterized
@@ -21,7 +20,7 @@ import tensorflow as tf
 from official.projects.volumetric_models.modeling import backbones
 from official.projects.volumetric_models.modeling import decoders
 from official.projects.volumetric_models.modeling.heads import segmentation_heads_3d
-from official.vision.beta.modeling import segmentation_model
+from official.vision.modeling import segmentation_model
 
 
 class SegmentationNetworkUNet3DTest(parameterized.TestCase, tf.test.TestCase):

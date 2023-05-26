@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
 # limitations under the License.
 
 """Configuration definitions for multi-task training."""
-from typing import Optional, Tuple
-
 import dataclasses
+from typing import Optional, Tuple
 
 from official.core import config_definitions as cfg
 from official.modeling import hyperparams
+from official.modeling.privacy import configs as dp_configs
 
 
 @dataclasses.dataclass
@@ -35,6 +35,12 @@ class MultiTaskConfig(hyperparams.Config):
   init_checkpoint: str = ""
   model: hyperparams.Config = None
   task_routines: Tuple[TaskRoutine, ...] = ()
+  # Configs for differential privacy
+  # These configs are only effective if you use create_optimizer in
+  # tensorflow_models/official/core/base_task.py
+  # DEPRECATED b/264611883
+  differential_privacy_config: Optional[
+      dp_configs.DifferentialPrivacyConfig] = None
 
 
 @dataclasses.dataclass

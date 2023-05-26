@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import dataclasses
 from official.core import config_definitions as cfg
 from official.core import exp_factory
 from official.modeling import hyperparams
-from official.vision.beta.configs import backbones_3d
-from official.vision.beta.configs import common
-from official.vision.beta.configs import video_classification
+from official.vision.configs import backbones_3d
+from official.vision.configs import common
+from official.vision.configs import video_classification
 
 
 @dataclasses.dataclass
@@ -53,6 +53,8 @@ class Movinet(hyperparams.Config):
   gating_activation: str = 'sigmoid'
   stochastic_depth_drop_rate: float = 0.2
   use_external_states: bool = False
+  average_pooling_type: str = '3d'
+  output_states: bool = True
 
 
 @dataclasses.dataclass

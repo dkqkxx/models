@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ from official.projects.edgetpu.vision.modeling import custom_layers
 from official.projects.edgetpu.vision.modeling.backbones import mobilenet_edgetpu
 from official.projects.edgetpu.vision.tasks import image_classification
 from official.projects.edgetpu.vision.tasks import semantic_segmentation as edgetpu_semantic_segmentation
-from official.vision.beta.tasks import semantic_segmentation
+from official.vision.tasks import semantic_segmentation
 # pylint: enable=unused-import
 
 MEAN_RGB = [127.5, 127.5, 127.5]
@@ -106,6 +106,12 @@ class ExportConfig(base_config.Config):
 
 def finalize_serving(model_output, export_config):
   """Adds extra layers based on the provided configuration."""
+
+  if isinstance(model_output, dict):
+    return {
+        key: finalize_serving(model_output[key], export_config)
+        for key in model_output
+    }
 
   finalize_method = export_config.finalize_method
   output_layer = model_output
@@ -183,8 +189,7 @@ def representative_dataset_gen(export_config):
   """Gets a python generator of numpy arrays for the given dataset."""
   quantization_config = export_config.quantization_config
   dataset = tfds.builder(
-      quantization_config.dataset_name,
-      data_dir=quantization_config.dataset_dir)
+      quantization_config.dataset_name, try_gcs=True)
   dataset.download_and_prepare()
   data = dataset.as_dataset()[quantization_config.dataset_split]
   iterator = data.as_numpy_iterator()
@@ -201,7 +206,8 @@ def configure_tflite_converter(export_config, converter):
   """Common code for picking up quantization parameters."""
   quantization_config = export_config.quantization_config
   if quantization_config.quantize:
-    if quantization_config.dataset_dir is None:
+    if (quantization_config.dataset_dir is
+        None) and (quantization_config.dataset_name is None):
       raise ValueError(
           'Must provide a representative dataset when quantizing the model.')
     converter.optimizations = [tf.lite.Optimize.DEFAULT]

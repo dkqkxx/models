@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import tensorflow as tf
 def _make_offset_wrapper(new_class_name: str, base_lr_class):
   """Generates a offset wrapper of learning rate schedule.
 
-  It will returns a subclass of the the `base_lr_class`, the subclass takes an
+  It will returns a subclass of the `base_lr_class`, the subclass takes an
   `offset` argument in the constructor. When the new class instance is called,
   the behavior is:
     new_class_object(step) = base_lr_class_object(step - offset)
@@ -386,11 +386,11 @@ class PowerDecayWithOffset(tf.keras.optimizers.schedules.LearningRateSchedule):
     }
 
 
-class StepConsineDecayWithOffset(
+class StepCosineDecayWithOffset(
     tf.keras.optimizers.schedules.LearningRateSchedule):
   """Stepwise cosine learning rate decay with offset.
 
-  Learning rate is equivalent to one or more consine decay(s) starting and
+  Learning rate is equivalent to one or more cosine decay(s) starting and
   ending at each interval.
 
   ExampleL
@@ -399,7 +399,7 @@ class StepConsineDecayWithOffset(
     boundaries: [100000, 110000]
     values: [1.0, 0.5]
     lr_decayed_fn = (
-    lr_schedule.StepConsineDecayWithOffset(
+    lr_schedule.StepCosineDecayWithOffset(
         boundaries,
         values))
     ```
@@ -412,7 +412,7 @@ class StepConsineDecayWithOffset(
                boundaries,
                values,
                offset: int = 0,
-               name: str = "StepConsineDecayWithOffset"):
+               name: str = "StepCosineDecayWithOffset"):
     """Initialize configuration of the learning rate schedule.
 
     Args:
@@ -444,7 +444,7 @@ class StepConsineDecayWithOffset(
         ] + [0])
 
   def __call__(self, global_step):
-    with tf.name_scope(self.name or "StepConsineDecayWithOffset"):
+    with tf.name_scope(self.name or "StepCosineDecayWithOffset"):
       global_step = tf.cast(global_step - self.offset, tf.float32)
       lr_levels = self.values
       lr_steps = self.boundaries
@@ -460,10 +460,6 @@ class StepConsineDecayWithOffset(
           tf.constant(math.pi) * (global_step) /
           (init_total_steps)) + 1.0) / 2.0 + next_init_lr)
       learning_rate = cosine_learning_rate
-      tf.compat.v1.logging.info("DEBUG lr %r next lr %r", learning_rate,
-                                cosine_learning_rate)
-      tf.compat.v1.logging.info("DEBUG lr %r next lr %r inittotalstep %r",
-                                init_lr, next_init_lr, init_total_steps)
 
       for i in range(1, num_levels):
         next_init_lr = lr_levels[i]
@@ -471,9 +467,6 @@ class StepConsineDecayWithOffset(
         next_total_steps = level_total_steps[i]
         next_next_init_lr = lr_levels[i + 1] if num_levels > i + 1 else 0.
 
-        tf.compat.v1.logging.info(
-            "DEBUG step %r nilr %r nss %r nts %r nnilr %r", global_step,
-            next_init_lr, next_start_step, next_total_steps, next_next_init_lr)
         next_cosine_learning_rate = ((next_init_lr - next_next_init_lr) *
                                      (tf.cos(
                                          tf.constant(math.pi) *
@@ -482,8 +475,6 @@ class StepConsineDecayWithOffset(
                                      next_next_init_lr)
         learning_rate = tf.where(global_step >= next_start_step,
                                  next_cosine_learning_rate, learning_rate)
-        tf.compat.v1.logging.info("DEBUG lr %r next lr %r", learning_rate,
-                                  next_cosine_learning_rate)
 
     return learning_rate
 

@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 # ==============================================================================
 """Implementation of SpineNet model.
 
@@ -119,7 +118,7 @@ class SpineNet(tf.keras.Model):
                input_specs=tf.keras.layers.InputSpec(shape=[None, 640, 640, 3]),
                min_level=3,
                max_level=7,
-               block_specs=build_block_specs(),
+               block_specs=None,
                endpoints_num_filters=256,
                resample_alpha=0.5,
                block_repeats=1,
@@ -135,7 +134,9 @@ class SpineNet(tf.keras.Model):
     """SpineNet model."""
     self._min_level = min_level
     self._max_level = max_level
-    self._block_specs = block_specs
+    self._block_specs = (
+        build_block_specs() if block_specs is None else block_specs
+    )
     self._endpoints_num_filters = endpoints_num_filters
     self._resample_alpha = resample_alpha
     self._block_repeats = block_repeats
@@ -455,7 +456,7 @@ class SpineNetBuilder(object):
                input_specs=tf.keras.layers.InputSpec(shape=[None, 640, 640, 3]),
                min_level=3,
                max_level=7,
-               block_specs=build_block_specs(),
+               block_specs=None,
                kernel_initializer='VarianceScaling',
                kernel_regularizer=None,
                bias_regularizer=None,
@@ -470,7 +471,7 @@ class SpineNetBuilder(object):
     self._input_specs = input_specs
     self._min_level = min_level
     self._max_level = max_level
-    self._block_specs = block_specs
+    self._block_specs = block_specs or build_block_specs()
     self._endpoints_num_filters = scaling_params['endpoints_num_filters']
     self._resample_alpha = scaling_params['resample_alpha']
     self._block_repeats = scaling_params['block_repeats']

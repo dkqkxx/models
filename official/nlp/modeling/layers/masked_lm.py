@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class MaskedLM(tf.keras.layers.Layer):
                output='logits',
                name=None,
                **kwargs):
-    super(MaskedLM, self).__init__(name=name, **kwargs)
+    super().__init__(name=name, **kwargs)
     self.embedding_table = embedding_table
     self.activation = activation
     self.initializer = tf.keras.initializers.get(initializer)
@@ -73,7 +73,7 @@ class MaskedLM(tf.keras.layers.Layer):
         initializer='zeros',
         trainable=True)
 
-    super(MaskedLM, self).build(input_shape)
+    super().build(input_shape)
 
   def call(self, sequence_data, masked_positions):
     masked_lm_input = self._gather_indexes(sequence_data, masked_positions)
@@ -115,7 +115,8 @@ class MaskedLM(tf.keras.layers.Layer):
 
     flat_offsets = tf.reshape(
         tf.range(0, batch_size, dtype=tf.int32) * seq_length, [-1, 1])
-    flat_positions = tf.reshape(positions + flat_offsets, [-1])
+    flat_positions = tf.reshape(
+        positions + tf.cast(flat_offsets, positions.dtype), [-1])
     flat_sequence_tensor = tf.reshape(sequence_tensor,
                                       [batch_size * seq_length, width])
     output_tensor = tf.gather(flat_sequence_tensor, flat_positions)

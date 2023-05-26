@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Definitions for AssembleNet/++ structures.
 
 This structure is a `list` corresponding to a graph representation of the
@@ -40,9 +39,9 @@ from typing import List, Optional, Tuple
 from official.core import config_definitions as cfg
 from official.core import exp_factory
 from official.modeling import hyperparams
-from official.vision.beta.configs import backbones_3d
-from official.vision.beta.configs import common
-from official.vision.beta.configs import video_classification
+from official.vision.configs import backbones_3d
+from official.vision.configs import common
+from official.vision.configs import video_classification
 
 
 @dataclasses.dataclass
@@ -62,7 +61,7 @@ def flat_lists_to_blocks(model_structures, model_edge_weights):
     if node[0] < 0:
       block = BlockSpec(level=node[0], temporal_dilation=node[1])
     else:
-      block = BlockSpec(
+      block = BlockSpec(  # pytype: disable=wrong-arg-types
           level=node[0],
           input_blocks=node[1],
           num_filters=node[2],
